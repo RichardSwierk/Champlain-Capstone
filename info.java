@@ -1,6 +1,9 @@
 /** 
 * this is just to store usefull code ive found 
+* Packet creation = scapy
+* 
 */
+
 
 
 
