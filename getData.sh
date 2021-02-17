@@ -1,5 +1,4 @@
 #!/bin/bash
-# PCV is a USB HID class device
 # Get info from PCV
 
 # Get the ID of the PCV by removing all other known connected devices
@@ -10,5 +9,11 @@ y=$(expr index "$device" " ")
 PCVID=${device:0:$y-1}
 
 # Get info from device
-sudo lsusb -v -d $PCVID > "$PCVID-info.txt"
-cat "$PCVID-info.txt"
+getInfo(){
+        sudo lsusb -v -d $PCVID > "$PCVID-info.txt"
+}
+
+# record data for 10s from PCV
+dump(){
+        sudo timeout 10s usbhid-dump -m $PCVID -es > "$1-dump.txt"
+}
