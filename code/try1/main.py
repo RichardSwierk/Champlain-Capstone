@@ -4,6 +4,7 @@ import usb
 import time
 import subprocess
 import datetime
+import sys
 
 vid=0x10b6
 pid=0x0502
@@ -105,6 +106,14 @@ def makeRecvPacketList(recvPacket):
 def receivePacket(endpoint_in, dev):
     return dev.read(endpoint_in.bEndpointAddress,64)
 
+def log(packet,who):
+    packet=" ".join(packet)
+    f=open("log.txt","a")
+    f.write(str(datetime.datetime.now())+" "+who+" \n")
+    f.write(packet)
+    f.write("\n")
+    f.close()
+
 #Check to see if PCV responded to the packet sent
 #If ID of sent packet is the same as ID of received packet then PCV responded to sent packet
 def checkResponse(packetToSend, recvPacket):
@@ -118,17 +127,26 @@ def checkResponse(packetToSend, recvPacket):
         print("RPM"+str(getRPM(payload)))
         print("Throttle"+str(getThrottle(payload)))
         count=count+1
-        f=open("log.txt","a")
-        f.write(datetime.datetime.now())
-        f.write(recvPacket)
-        f.close()
 
 #Send packet to PCV and then receive packet from PCV
 def sendRead(endpoint_out, packetToSend, endpoint_in, dev):
     try:
         sendPacket(endpoint_out, packetToSend)
-        recvPacket=receivePacket(endpoint_in, dev)
-        checkResponse(packetToSend, recvPacket)
+        log(makeSendPacketList(packetToSend),"sent")
+        print(makeSendPacketList(packetToSend))
+        for x in range(10):
+            try:
+                recvPacket=receivePacket(endpoint_in, dev)
+                print(makeRecvPacketList(recvPacket))
+                log(makeRecvPacketList(recvPacket),"received")
+                checkResponse(packetToSend, recvPacket)
+            except KeyboardInterrupt:
+                sys.exit()
+            except:
+                time.sleep(1)
+                pass
+    except KeyboardInterrupt:
+        sys.exit()
     except:
         pass
 
@@ -138,9 +156,9 @@ dev=connect()
 endpoint_out = dev[0][(0,0)][1]
 #Set endpoint in address
 endpoint_in = dev[0][(0,0)][0]
-#Get packet to send to PCV
-packetToSend=getSendPacket()
 #Send packet, read received packet, check to see if there ids match
-while count<6:
+#while count<6:
+for x in range(10):
+    packetToSend=getSendPacket()
     sendRead(endpoint_out, packetToSend, endpoint_in, dev)
 
