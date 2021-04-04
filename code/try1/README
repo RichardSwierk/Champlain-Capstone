@@ -1,3 +1,0 @@
-This code did not work
-It recieved the packets being sent from the PCV, but the PCV did not respond to the packets that I sent it
-A response packet should have the same first 4 bytes as the sent packet
