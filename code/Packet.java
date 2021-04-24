@@ -74,7 +74,6 @@ public class Packet{
 		for (int i = 0; i < payload.length; i++) {
 			packet.data[8 + i] = payload[i];
 		}
-
 		return bytesToHex(packet.data);
 	}
 

@@ -6,26 +6,10 @@ import subprocess
 import datetime
 import sys
 
-#vid=0x10b6
-#pid=0x0502
 vid=0x16c0
 pid=0x0486
 
 count=0
-
-#PCV Commands
-INVALID=0
-CAN_PASS=8450
-GET_CHANNEL_STATUS=5
-READ_FLASH=6
-CLEAR_ERRORS=20481
-ENTER_EDIT_MODE=20482
-EXIT_EDIT_MODE=20483
-GET_BOOT_INFO=234
-GET_FIRMWARE_INFO=235
-UPDATE_DEVICE=20480
-READ_FRAM=3
-WRITE_FRAM=4
 
 #Wait for PCV to turn on
 def connect():
@@ -106,6 +90,7 @@ def makeRecvPacketList(recvPacket):
 def receivePacket(endpoint_in, dev):
     return dev.read(endpoint_in.bEndpointAddress,64)
 
+#Log all packets
 def log(packet,who):
     f=open("log.txt","a")
     f.write(str(datetime.datetime.now())+" "+who+" \n")
@@ -116,18 +101,27 @@ def log(packet,who):
     f.write("\n")
     f.close()
 
+#Log packets that are response packets from PCV
+def logRecv(packet):
+    f=open("recvLog.txt","a")
+    f.write(str(datetime.datetime.now())+" \n")
+    f.write(" ".join(packet[0:16])+" \n")
+    f.write(" ".join(packet[16:32])+" \n")
+    f.write(" ".join(packet[32:48])+" \n")
+    f.write(" ".join(packet[48:64])+" \n")
+    f.write("Command: "+str(getCommand(packet))+" \n")
+    f.write("Payload length: "+str(getPayloadLength(packet))+" \n")
+    payload=getPayload(getPayloadLength(packet),packet+" \n")
+    f.write("RPM: "+str(getRPM(payload))+" \n")
+    f.write("Throttle: "+str(getThrottle(payload))+"% \n\n")
+    f.close()
+
 #Check to see if PCV responded to the packet sent
 #If ID of sent packet is the same as ID of received packet then PCV responded to sent packet
 def checkResponse(packetToSend, recvPacket):
-    sendID=getID(makeSendPacketList(packetToSend))
     recvID=getID(makeRecvPacketList(recvPacket))
-    if sendID == recvID:
-        packetList=makeSendPacketList(recvPacket)
-        print("Command: "+str(getCommand(packetList)))
-        print("Payload length: "+str(getPayloadLength(packetList)))
-        payload=getPayload(getPayloadLength(packetList),packetList)
-        print("RPM"+str(getRPM(payload)))
-        print("Throttle"+str(getThrottle(payload)))
+    if "A1" in recvID & "B2" in recvID & "C3" in recvID & "D4" in recvID & int(getCommand(makeRecvPacketList(recvPacket)))==5:
+        logRecv(makeRecvPacketList(recvPacket))
         count=count+1
         return True
     else:
@@ -138,18 +132,18 @@ def sendRead(endpoint_out, packetToSend, endpoint_in, dev):
     try:
         sendPacket(endpoint_out, packetToSend)
         log(makeSendPacketList(packetToSend),"sent")
-        print(makeSendPacketList(packetToSend))
+        #print(makeSendPacketList(packetToSend))
         for x in range(5):
             try:
                 recvPacket=receivePacket(endpoint_in, dev)
-                print(makeRecvPacketList(recvPacket))
+                #print(makeRecvPacketList(recvPacket))
                 log(makeRecvPacketList(recvPacket),"received")
                 if checkResponse(packetToSend, recvPacket)==True:
                     break
             except KeyboardInterrupt:
                 sys.exit()
             except:
-                time.sleep(1)
+                time.sleep(0.5)
                 pass
     except KeyboardInterrupt:
         sys.exit()
