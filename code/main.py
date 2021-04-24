@@ -111,7 +111,7 @@ def logRecv(packet):
     f.write(" ".join(packet[48:64])+" \n")
     f.write("Command: "+str(getCommand(packet))+" \n")
     f.write("Payload length: "+str(getPayloadLength(packet))+" \n")
-    payload=getPayload(getPayloadLength(packet),packet+" \n")
+    payload=getPayload(getPayloadLength(packet),packet)
     f.write("RPM: "+str(getRPM(payload))+" \n")
     f.write("Throttle: "+str(getThrottle(payload))+"% \n\n")
     f.close()
