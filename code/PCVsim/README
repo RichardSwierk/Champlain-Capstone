@@ -1,0 +1,5 @@
+--PCVsim.ino--
+   This code has only been tested on a Teensy Arduino LC
+This is the arduino code for the Power Commander V simulator. What this code does when plugged into a computer is first tests to see if any packets are being sent to it. If it receives
+a packet then it will send a packet with the ID, A1 B2 C3 D4, that has a RPM value between 800 and 8000, and a throttle value between 0 and 100. If it does not recieve a packet then it will 
+send Can Pass packet 1. Then is it does not receive a packet it will send Can Pass packet 2 if Can Pass packet 1 was send before it. 
