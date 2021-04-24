@@ -120,7 +120,7 @@ def logRecv(packet):
 #If ID of sent packet is the same as ID of received packet then PCV responded to sent packet
 def checkResponse(packetToSend, recvPacket):
     recvID=getID(makeRecvPacketList(recvPacket))
-    if "A1" in recvID & "B2" in recvID & "C3" in recvID & "D4" in recvID & int(getCommand(makeRecvPacketList(recvPacket)))==5:
+    if int(getCommand(makeRecvPacketList(recvPacket)))==5:
         logRecv(makeRecvPacketList(recvPacket))
         count=count+1
         return True
