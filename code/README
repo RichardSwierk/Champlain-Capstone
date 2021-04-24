@@ -1,0 +1,27 @@
+--How to run the code--                                            
+      Code has only been tested on Ubuntu
+1. Install python
+2. Install javac
+3. git clone the repository
+4. Run the following command to compile the java code
+     javac Packet.java
+5. Run the following command to make the main code executable
+     chmod +x main.py
+6. Run the code with the following command
+     sudo python main.py
+
+--Command.java--
+This program stores all of the commands that the Power Commander V knowns.
+The main commands are Can Pass which has a code of 8450. This command is sent when the Power Commander V does not receive any packets from connected devices
+The command that is recieved when the Power Commander V receives a packet is Get Channel Status which has a code of 5.
+
+--Packet.java--
+This is the program that creates the packet that is sent to the Power Commander V. The packet that is created will tell the Power Commander V to send back the RPM and throttle values
+
+--main.py--
+This is the main code. In this code it will connect to the Power Commander V via its product and vender id. It will then get the endpoint out and endpoint in values of the Power Commander V.
+The endpoint in value is the port that is used to receive data from the Power Commander V. The endpoint out value is the port that is used to send data to the Power Commander V. The program will then 
+go into a loop and will do the following ten times. First it calls Packet.java and receives the packet that the program creates. Then it sends that packet to the Power Commander V through the endpoint out port.
+then it receives five packets from the Power Commander V through the endpoint in port. It will then check to see if any of the received packets had the ID of A1 B2 C3 D4 and if they have the command value 5. 
+If the packet has both of those things then it logs the time, date, packet values, command value, payload length, rpm value, throttle value. If it finds no packets with the correct packet ID then
+it logs the sent packet and the five received packets. 
